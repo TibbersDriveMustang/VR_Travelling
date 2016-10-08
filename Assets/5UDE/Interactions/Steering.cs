@@ -18,6 +18,9 @@ public class Steering : MonoBehaviour {
     [Tooltip("The tracking device used to determine absolute direction for steering.")]
     public Tracker tracker;
 
+	[Tooltip("Body to detect collision")]
+	public Affect body;
+
     [Tooltip("The controller joystick used to determine relative direction (forward/backward) and speed.")]
 	public Axis joystick;
 
