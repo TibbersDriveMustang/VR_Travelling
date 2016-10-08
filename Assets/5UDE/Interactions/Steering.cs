@@ -11,7 +11,7 @@ public class Steering : MonoBehaviour {
 		SteeringLeft,
 		SteeringRight,
 		SpeedUp,
-		Stuck
+		SteeringStuck
 	};
 	
     // Inspector parameters
