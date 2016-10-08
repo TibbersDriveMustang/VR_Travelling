@@ -11,12 +11,12 @@ public class Steering : MonoBehaviour {
 		SteeringLeft,
 		SteeringRight,
 		SpeedUp,
+		NotJump,
 		JumpRise,
+		JumpOnAir,
 		JumpFall
 	};
-
-	//Check if player is still on air while jumping
-	private bool onAir;
+		
 	
     // Inspector parameters
     [Tooltip("The tracking device used to determine absolute direction for steering.")]
@@ -46,11 +46,15 @@ public class Steering : MonoBehaviour {
 	// Private interaction variables
 	private SteeringState state;
 
+	//States while player is jumping
+	private SteeringState jumpState;
+
 	// Called at the end of the program initialization
 	void Start () {
 
 		// Set initial steering state to not steering
 		state = SteeringState.NotSteering;
+		jumpState = SteeringState.NotJump;
 	}
 		
     // FixedUpdate is not called every graphical frame but rather every physics frame
@@ -86,8 +90,11 @@ public class Steering : MonoBehaviour {
 
 				//Change state to steeringRight
 				state = SteeringState.SteeringRight;
-			} else if (buttonJump.GetPress ()) {
-				state = SteeringState.JumpRise;
+			}
+
+			if (jumpState == SteeringState.NotJump && buttonJump.GetPress ()) {
+
+				jumpState = SteeringState.JumpRise;
 			}
 			// Process current not steering state
 			else {
@@ -95,36 +102,6 @@ public class Steering : MonoBehaviour {
 				// Nothing to do for not steering
 			}
 		} 
-		else if (state == SteeringState.JumpRise) {
-			if (space.transform.position.y < 3.0f) {
-				//Vector3 temp = space.transform.position;
-				Vector3 temp = body.transform.position;
-				temp.y += 0.2f;
-				//space.transform.position = temp;
-				body.transform.position = temp;
-			} else {
-				state = SteeringState.JumpFall;
-			}
-		}
-
-		else if(state == SteeringState.JumpFall){
-			if (space.transform.position.y > 1.0f) {
-				//Vector3 temp = space.transform.position;
-				Vector3 temp = body.transform.position;
-				temp.y -= 0.2f;
-				//space.transform.position = temp;
-				body.transform.position = temp;
-			} else {
-				//Vector3 temp = space.transform.position;
-				Vector3 temp = body.transform.position;
-				temp.y = 0.6f;
-				//space.transform.position = temp;
-				body.transform.position = temp;
-				Quaternion resetRotation = new Quaternion(0.0f,0.0f,0.0f,0.0f);
-				body.transform.rotation = resetRotation;
-				state = SteeringState.NotSteering;
-			}
-		}
 
 		// If state is steering forward
 		else if (state == SteeringState.SteeringForward) {
@@ -142,7 +119,7 @@ public class Steering : MonoBehaviour {
 				// Change state to steering backward
 				state = SteeringState.SteeringBackward;
 			}
-
+				
 			// Process current steering forward state
 			else {
 
@@ -157,6 +134,11 @@ public class Steering : MonoBehaviour {
 				Vector3 temp = joystick.GetAxis ().y * direction * speed * speedChange * Time.deltaTime;
 				space.transform.position += temp;
 
+			}
+			//Jump
+			if (jumpState == SteeringState.NotJump && buttonJump.GetPress ()) {
+
+				jumpState = SteeringState.JumpRise;
 			}
 		}
 
@@ -191,6 +173,12 @@ public class Steering : MonoBehaviour {
 				space.transform.position += temp;
 
 			}
+			//Jump
+			if (jumpState == SteeringState.NotJump && buttonJump.GetPress ()) {
+
+				jumpState = SteeringState.JumpRise;
+			}
+
 		} 
 		else if (state == SteeringState.SteeringLeft) {
 
@@ -213,6 +201,12 @@ public class Steering : MonoBehaviour {
 				}
 				// Translate the space based on the tracker's absolute forward direction and the joystick's backward value
 				space.transform.position += joystick.GetAxis().x * direction * speed * speedChange * Time.deltaTime;
+			}
+
+			//Jump
+			if (jumpState == SteeringState.NotJump && buttonJump.GetPress ()) {
+
+				jumpState = SteeringState.JumpRise;
 			}
 		
 		}
@@ -239,6 +233,49 @@ public class Steering : MonoBehaviour {
 				space.transform.position += joystick.GetAxis().x * direction * speed * speedChange * Time.deltaTime;
 			}
 
+			//Jump
+			if (jumpState == SteeringState.NotJump && buttonJump.GetPress ()) {
+
+				jumpState = SteeringState.JumpRise;
+			}
+
 		}
+
+		//handle jumping process
+		if (jumpState == SteeringState.JumpRise) {
+			if (space.transform.position.y < 3.0f) {
+				//Vector3 temp = space.transform.position;
+				Vector3 temp = space.transform.position;
+				temp.y += 0.2f;
+				//space.transform.position = temp;
+				space.transform.position = temp;
+			} else {
+				jumpState = SteeringState.JumpFall;
+			}
+		}
+		else if(jumpState == SteeringState.JumpFall){
+			if (space.transform.position.y > 0.9f) {
+				//Vector3 temp = space.transform.position;
+				Vector3 temp = space.transform.position;
+				temp.y -= 0.2f;
+				//space.transform.position = temp;
+				space.transform.position = temp;
+				Debug.Log ("66666666666666");
+				Debug.Log ("y: " + space.transform.position.y + " position: " + temp);
+			} 
+			else {
+				//Vector3 temp = space.transform.position;
+				Vector3 temp = space.transform.position;
+				temp.y = 0.6f;
+				//space.transform.position = temp;
+				space.transform.position = temp;
+				Quaternion resetRotation = new Quaternion(0.0f,0.0f,0.0f,0.0f);
+				space.transform.rotation = resetRotation;
+				jumpState = SteeringState.NotJump;
+				Debug.Log ("111111111111111111");
+			}
+		}
+
+		Debug.Log ("2" + jumpState);
 	}
 }
