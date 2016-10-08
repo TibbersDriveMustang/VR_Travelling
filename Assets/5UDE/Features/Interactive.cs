@@ -55,7 +55,7 @@ public class Interactive : Element {
 		// OnCollision state has not been reset yet because FixedUpdate occurs first
 		onCollision = false;
 	}
-
+		
 	// Called first by every OnCollision function
 	protected virtual void OnCollisionUpdate () {
 

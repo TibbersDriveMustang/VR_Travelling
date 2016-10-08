@@ -11,7 +11,8 @@ public class Steering : MonoBehaviour {
 		SteeringLeft,
 		SteeringRight,
 		SpeedUp,
-		SteeringStuck
+		JumpRise,
+		JumpFall
 	};
 	
     // Inspector parameters
@@ -29,6 +30,9 @@ public class Steering : MonoBehaviour {
 
 	[Tooltip("A button to speedup travelling speed")]
 	public Button buttonSpeedUp;
+
+	[Tooltip("Button to jump")]
+	public Button buttonJump;
 
     [Tooltip("The space that is translated by this interaction. Usually set to the physical tracking space.")]
     public Space space;
@@ -79,18 +83,44 @@ public class Steering : MonoBehaviour {
 
 				//Change state to steeringRight
 				state = SteeringState.SteeringRight;
+			} else if (buttonJump.GetPress ()) {
+				state = SteeringState.JumpRise;
 			}
-
-
 			// Process current not steering state
 			else {
 
 				// Nothing to do for not steering
 			}
 		} 
+		else if (state == SteeringState.JumpRise) {
+			if (space.transform.position.y < 50.0f) {
+				//Vector3 temp = space.transform.position;
+				Vector3 temp = body.transform.position;
+				temp.y += 1.0f;
+				//space.transform.position = temp;
+				body.transform.position = temp;
+			} else {
+				state = SteeringState.JumpFall;
+			}
+		}
 
-		else if (state == SteeringState.SteeringStuck) {
-			Debug.Log ("=================At SteeringStuck===============");
+		else if(state == SteeringState.JumpFall){
+			if (space.transform.position.y > 1.0f) {
+				//Vector3 temp = space.transform.position;
+				Vector3 temp = body.transform.position;
+				temp.y -= 1.0f;
+				//space.transform.position = temp;
+				body.transform.position = temp;
+			} else {
+				//Vector3 temp = space.transform.position;
+				Vector3 temp = body.transform.position;
+				temp.y = 2.0f;
+				//space.transform.position = temp;
+				body.transform.position = temp;
+				Quaternion resetRotation = new Quaternion(0.0f,0.0f,0.0f,0.0f);
+				body.transform.rotation = resetRotation;
+				state = SteeringState.NotSteering;
+			}
 		}
 
 		// If state is steering forward
@@ -121,11 +151,9 @@ public class Steering : MonoBehaviour {
 					speedChange = 3.0f;	
 				}
 				// Translate the space based on the tracker's absolute forward direction and the joystick's forward value
-				space.transform.position += joystick.GetAxis ().y * direction * speed * speedChange * Time.deltaTime;
-				if (body.collisionOngoing) {
-					Debug.Log ("=================Go to SteeringStuck===============");
-					state = SteeringState.SteeringStuck;
-				}
+				Vector3 temp = joystick.GetAxis ().y * direction * speed * speedChange * Time.deltaTime;
+				space.transform.position += temp;
+
 			}
 		}
 
@@ -156,7 +184,9 @@ public class Steering : MonoBehaviour {
 					speedChange = 3.0f;	
 				}
 				// Translate the space based on the tracker's absolute forward direction and the joystick's backward value
-				space.transform.position += joystick.GetAxis ().y * direction * speed * speedChange * Time.deltaTime;
+				Vector3 temp = joystick.GetAxis ().y * direction * speed * speedChange * Time.deltaTime;
+				space.transform.position += temp;
+
 			}
 		} 
 		else if (state == SteeringState.SteeringLeft) {
