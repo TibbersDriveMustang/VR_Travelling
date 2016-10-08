@@ -46,7 +46,7 @@ public class VirtualHand : MonoBehaviour {
 			
 			// If the hand is touching something
 			if (hand.triggerOngoing) {
-
+				Debug.Log("Touching");
 				// Change state to touching
 				state = VirtualHandState.Touching;
 			}

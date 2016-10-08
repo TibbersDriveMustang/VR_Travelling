@@ -19,7 +19,7 @@ public class Steering : MonoBehaviour {
     public Tracker tracker;
 
 	[Tooltip("Body to detect collision")]
-	public Affect body;
+	public Interactive body;
 
     [Tooltip("The controller joystick used to determine relative direction (forward/backward) and speed.")]
 	public Axis joystick;
@@ -87,6 +87,10 @@ public class Steering : MonoBehaviour {
 
 				// Nothing to do for not steering
 			}
+		} 
+
+		else if (state == SteeringState.SteeringStuck) {
+			Debug.Log ("=================At SteeringStuck===============");
 		}
 
 		// If state is steering forward
@@ -118,6 +122,10 @@ public class Steering : MonoBehaviour {
 				}
 				// Translate the space based on the tracker's absolute forward direction and the joystick's forward value
 				space.transform.position += joystick.GetAxis ().y * direction * speed * speedChange * Time.deltaTime;
+				if (body.collisionOngoing) {
+					Debug.Log ("=================Go to SteeringStuck===============");
+					state = SteeringState.SteeringStuck;
+				}
 			}
 		}
 
