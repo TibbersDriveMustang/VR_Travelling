@@ -14,6 +14,9 @@ public class Steering : MonoBehaviour {
 		JumpRise,
 		JumpFall
 	};
+
+	//Check if player is still on air while jumping
+	private bool onAir;
 	
     // Inspector parameters
     [Tooltip("The tracking device used to determine absolute direction for steering.")]
@@ -93,10 +96,10 @@ public class Steering : MonoBehaviour {
 			}
 		} 
 		else if (state == SteeringState.JumpRise) {
-			if (space.transform.position.y < 50.0f) {
+			if (space.transform.position.y < 3.0f) {
 				//Vector3 temp = space.transform.position;
 				Vector3 temp = body.transform.position;
-				temp.y += 1.0f;
+				temp.y += 0.2f;
 				//space.transform.position = temp;
 				body.transform.position = temp;
 			} else {
@@ -108,13 +111,13 @@ public class Steering : MonoBehaviour {
 			if (space.transform.position.y > 1.0f) {
 				//Vector3 temp = space.transform.position;
 				Vector3 temp = body.transform.position;
-				temp.y -= 1.0f;
+				temp.y -= 0.2f;
 				//space.transform.position = temp;
 				body.transform.position = temp;
 			} else {
 				//Vector3 temp = space.transform.position;
 				Vector3 temp = body.transform.position;
-				temp.y = 2.0f;
+				temp.y = 0.6f;
 				//space.transform.position = temp;
 				body.transform.position = temp;
 				Quaternion resetRotation = new Quaternion(0.0f,0.0f,0.0f,0.0f);
